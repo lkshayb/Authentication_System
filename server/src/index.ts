@@ -19,6 +19,8 @@ const pool = new Pool({
 })
 
 try{
+    app.use('/otp',otprouters)
+
     app.post('/ifexist',async (req:Request,res:Response) => {
         const mail_id = req.body.mailid;
         try{
@@ -30,7 +32,6 @@ try{
         }
     })
 
-    app.use('/otp',otprouters)
     app.post('/register', async (req:Request,res:Response) => {
         const first_name = req.body.first_name;
         const last_name = req.body.last_name;
@@ -53,6 +54,13 @@ try{
             console.log(e)
         }
         
+    })
+
+    app.post('/login',(req:Request,res:Response) => {
+        let param = "uname";
+        if(req.body.mail_id){
+            param = "mail";
+        }
     })
 }catch(e){
     console.log(e)
