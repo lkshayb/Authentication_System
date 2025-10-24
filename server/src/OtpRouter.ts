@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express'
 const router = express.Router();
 import type {Request,Response} from "express";
 import {sendOtpEmail} from "./functions.js";

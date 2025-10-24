@@ -19,6 +19,7 @@ const pool = new Pool({
 })
 
 try{
+
     app.use('/otp',otprouters)
 
     app.post('/ifexist',async (req:Request,res:Response) => {
@@ -53,22 +54,29 @@ try{
         catch(e){
             console.log(e)
         }
-        
     })
 
-    app.post('/login',(req:Request,res:Response) => {
-        let param = "uname";
+    app.post('/login',async (req:Request,res:Response) => {
+        let param,differ;
         if(req.body.mail_id){
-            param = "mail";
+            param = "mail_id";
+            differ = req.body.mail_id;
+        }else{
+            param = "username";
+            differ = req.body.username;
         }
+        try{
+            const contents = await pool.query(`SELECT ${param},user_password FROM users WHERE ${param} = $1`,[differ])
+            if(contents){
+                if(await bcrypt.compare(req.body.password,contents.rows[0].user_password)) res.status(500).send(true)
+                else res.status(400).send(false);
+            }
+        }catch(e) {console.log(e)}
     })
+
 }catch(e){
     console.log(e)
 }
-
-
-
-
 
 const PORT = process.env.PORT;
 app.listen(PORT,() => console.log(`server is running at http://localhost:${PORT}`))
