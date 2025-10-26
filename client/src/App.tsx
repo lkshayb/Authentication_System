@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import {Github,Linkedin} from 'lucide-react'
 import './App.css'
 function App() {
-  const [isReturnedUser,setisReturnedUser] = useState<Boolean | null>(true);
-  /*
+  const [isReturnedUser,setisReturnedUser] = useState<Boolean | null>(false);
+  
   useEffect(() => {
 
     if(localStorage.getItem("hasVisited")) setisReturnedUser(true);
@@ -13,13 +14,18 @@ function App() {
     }
 
   },[])
-*/
+
   if(isReturnedUser === null) return null;
   
   return (
     <div className='overflow max-h-screen max-w-screen '>
       <div className='absolute h-full w-full bg-blue-100/50 backdrop-blur-5xl flex justify-center items-center'>
-        <div className=' rounded-xl py-10 mx-5 w-110 min-w-80 bg-white/90 shadow-lg flex flex-col text-center'>
+        <div className='absolute flex gap-5 right-0 bottom-0 mx-7 my-4'>
+          <a className=' cursor-pointer hover:text-black/50 duration-300' target='_blank' href='https://github.com/lkshayb'><Github/></a>
+          <a className=' cursor-pointer hover:text-black/50 duration-300' target='_blank' href='https://linkedin.com/in/lkshayb'><Linkedin/></a>
+        </div>
+        
+        <div className=' rounded-xl py-10 mx-5 w-110 min-w-80 bg-white/90 shadow-lg flex flex-col text-center duration-300 '>
           <span className='font-sans font-medium text-lg'>{isReturnedUser ? "Welcome back, Captain!" : "Looks like you're new here!"}</span>
           <span className='font-sans font-medium text-xs text-gray-400'>{isReturnedUser ? "We missed you! Please enter your details." : "Let's create a new account for you"}</span> 
           <div className='text-left mt-10 text-sm font-semibold flex flex-col mx-12'>
@@ -32,6 +38,7 @@ function App() {
               <input type="password" className='mt-1 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder='Enter Password ' />
             </div>
             <button className='mt-6 bg-gradient-to-tr from-blue-400 to-blue-600 text-white/90 px-4 py-3 rounded-xl cursor-pointer hover:opacity-90 duration-300'>{isReturnedUser ? "Login" : "Sign Up"}</button>
+            <span className='text-gray-600 text-center mt-10'>{isReturnedUser ? "Don't have an account? " : "Already have an account? "} <span onClick={() => setisReturnedUser(e => !e)} className='text-blue-600 cursor-pointer'>{isReturnedUser ? "Sign Up" : "Login"}</span></span>
           </div>
         </div>
       </div>
