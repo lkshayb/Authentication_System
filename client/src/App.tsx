@@ -10,7 +10,7 @@ function App() {
   const password = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [level,setlevel] = useState(0);
-
+  setlevel(0)
   useEffect(() => {
 
     if(localStorage.getItem("hasVisited")) setisReturnedUser(true);
