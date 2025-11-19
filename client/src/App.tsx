@@ -3,7 +3,10 @@ import {Github,Linkedin} from 'lucide-react'
 import './App.css'
 function App() {
   const [isReturnedUser,setisReturnedUser] = useState<Boolean | null>(false);
-  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
 
     if(localStorage.getItem("hasVisited")) setisReturnedUser(true);
@@ -17,6 +20,10 @@ function App() {
 
   if(isReturnedUser === null) return null;
   
+  const handleSubmit = () => {
+    setLoading(true)
+  }
+
   return (
     <div className='overflow max-h-screen max-w-screen '>
       <div className='absolute h-full w-full bg-blue-100/50 backdrop-blur-5xl flex justify-center items-center'>
@@ -31,11 +38,11 @@ function App() {
           <div className='text-left mt-10 text-sm font-semibold flex flex-col mx-12'>
             <div className='flex-col flex'>
               <span className='ml-4'>{isReturnedUser ? "Email/Username" : "Email"}</span>
-              <input type="text" className='mt-1 mb-4 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder={`${isReturnedUser ? "Enter your Email or Username": "Enter your Email"}`} />
+              <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} className='mt-1 mb-4 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder={`${isReturnedUser ? "Enter your Email or Username": "Enter your Email"}`} />
             </div>
             <div className={`${isReturnedUser ? "flex flex-col":"hidden"}`}>
               <span className='ml-4'>Password</span>
-              <input type="password" className='mt-1 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder='Enter Password ' />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className='mt-1 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder='Enter Password ' />
             </div>
             <button className='mt-6 bg-gradient-to-tr from-blue-400 to-blue-600 text-white/90 px-4 py-3 rounded-xl cursor-pointer hover:opacity-90 duration-300'>{isReturnedUser ? "Login" : "Sign Up"}</button>
             <span className='text-gray-600 text-center mt-10'>{isReturnedUser ? "Don't have an account? " : "Already have an account? "} <span onClick={() => setisReturnedUser(e => !e)} className='text-blue-600 cursor-pointer'>{isReturnedUser ? "Sign Up" : "Login"}</span></span>
