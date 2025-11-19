@@ -11,7 +11,6 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [level,setlevel] = useState(0);
   useEffect(() => {
-    setlevel(0)
     if(localStorage.getItem("hasVisited")) setisReturnedUser(true);
 
     else{
@@ -38,10 +37,12 @@ function App() {
           })
         })
         const data = await response.json(); 
-        console.log(data);
+        if(data){
+          setlevel(1.1)
+        }else setlevel(1.2)
       } 
       catch(e){
-        console.log(e)
+        alert("An error occured while processing your request! Please try again later.")
       }
     }
     setLoading(false)
@@ -49,36 +50,43 @@ function App() {
   }
 
   function RootComp(){
+    function Level0(){
+      return(
+        <div className='flex flex-col text-center'>
+          <span className='font-sans font-medium text-lg'>{isReturnedUser ? "Welcome back, Captain!" : "Looks like you're new here!"}</span>
+          <span className='font-sans font-medium text-xs text-gray-400'>{isReturnedUser ? "We missed you! Please enter your details." : "Let's create a new account for you"}</span> 
+          <div className='text-left mt-10 text-sm font-semibold flex flex-col mx-12'>
+            <div className='flex-col flex'>
+              <span className='ml-4'>{isReturnedUser ? "Email/Username" : "Email"}</span>
+              <input type="text" ref={email} className='mt-1 mb-4 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder={`${isReturnedUser ? "Enter your Email or Username": "Enter your Email"}`} />
+            </div>
+            <div className={`${isReturnedUser ? "flex flex-col":"hidden"}`}>
+              <span className='ml-4'>Password</span>
+              <input type="password" ref={password} className='mt-1 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder='Enter Password ' />
+            </div>
+            <button onClick={handleSubmit}  className={`mt-6 bg-gradient-to-tr from-blue-400 to-blue-600 text-white/90 px-4 py-3 rounded-xl duration-300 ${loading ? "opacity-70 cursor-not-allowed":"hover:opacity-90 cursor-pointer"}`}>
+              {loading ? "Loading" : isReturnedUser ? "Login" : "SignUp" }
+            </button>
+            <span className='text-gray-500 text-center mt-10'>{isReturnedUser ? "Don't have an account? " : "Already have an account? "} <span onClick={() => setisReturnedUser(e => !e)} className='text-blue-600 cursor-pointer'>{isReturnedUser ? "Sign Up" : "Login"}</span></span>
+          </div>
+        </div>
+      )
+    }
     return (
       <div className=' rounded-xl py-10 mx-5 w-110 min-w-80 bg-white/90 shadow-lg flex flex-col text-center duration-300 '>
-        <span className='font-sans font-medium text-lg'>{isReturnedUser ? "Welcome back, Captain!" : "Looks like you're new here!"}</span>
-        <span className='font-sans font-medium text-xs text-gray-400'>{isReturnedUser ? "We missed you! Please enter your details." : "Let's create a new account for you"}</span> 
-        <div className='text-left mt-10 text-sm font-semibold flex flex-col mx-12'>
-          <div className='flex-col flex'>
-            <span className='ml-4'>{isReturnedUser ? "Email/Username" : "Email"}</span>
-            <input type="text" ref={email} className='mt-1 mb-4 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder={`${isReturnedUser ? "Enter your Email or Username": "Enter your Email"}`} />
-          </div>
-          <div className={`${isReturnedUser ? "flex flex-col":"hidden"}`}>
-            <span className='ml-4'>Password</span>
-            <input type="password" ref={password} className='mt-1 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder='Enter Password ' />
-          </div>
-          <button onClick={handleSubmit}  className={`mt-6 bg-gradient-to-tr from-blue-400 to-blue-600 text-white/90 px-4 py-3 rounded-xl duration-300 ${loading ? "opacity-70 cursor-not-allowed":"hover:opacity-90 cursor-pointer"}`}>
-            {loading ? "Loading" : isReturnedUser ? "Login" : "SignUp" }
-          </button>
-          <span className='text-gray-500 text-center mt-10'>{isReturnedUser ? "Don't have an account? " : "Already have an account? "} <span onClick={() => setisReturnedUser(e => !e)} className='text-blue-600 cursor-pointer'>{isReturnedUser ? "Sign Up" : "Login"}</span></span>
-        </div>
+        {level === 0 ? <Level0/> : level === 1.1 ? "Login Success" : level === 1.2 ? "Login Failed" : "x"}
       </div>
     )
   }
 
   return (
     <div className='overflow max-h-screen max-w-screen '>
-      <div className='absolute h-full w-full bg-blue-100/50 backdrop-blur-5xl flex justify-center items-center'>
+      <div className='absolute h-full w-full bg-blue-100/50 backdrop-blur-5xl flex flex-col justify-center items-center'>
         <div className='absolute flex gap-5 right-0 bottom-0 mx-7 my-4'>
           <a className=' cursor-pointer hover:text-black/50 duration-300' target='_blank' href='https://github.com/lkshayb'><Github/></a>
           <a className=' cursor-pointer hover:text-black/50 duration-300' target='_blank' href='https://linkedin.com/in/lkshayb'><Linkedin/></a>
         </div>
-        {level == 0 ? <RootComp/>: ""}
+        <RootComp/>
         
       </div>
       <div className='fixed blur-[100px] -z-10 -right-200 bg-[#7F30FF]  h-[70vh] w-[1500px] rounded-full rotate-[45deg]'></div>
