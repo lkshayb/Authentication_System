@@ -9,8 +9,13 @@ import otprouters from './OtpRouter.js'
 
 dotenv.config();
 const app = express();
+
+app.use(cors({
+    origin: "http://localhost:5173",   // Vite
+    methods: ["GET", "POST"],
+    credentials: true
+}));
 app.use(express.json());
-app.use(cors());
 app.use(bodyParser.json());
 
 
@@ -19,7 +24,7 @@ const pool = new Pool({
 })
 
 try{
-
+    
     app.use('/otp',otprouters)
 
     app.post('/ifexist',async (req:Request,res:Response) => {
@@ -57,21 +62,23 @@ try{
     })
 
     app.post('/login',async (req:Request,res:Response) => {
-        let param,differ;
-        if(req.body.mail_id){
-            param = "mail_id";
-            differ = req.body.mail_id;
-        }else{
-            param = "username";
-            differ = req.body.username;
-        }
+        console.log("RAW BODY:", req.body);
+        const { mail_id, username, password } = req.body;
+        const param = mail_id ? "mail_id" : "username";
+        const differ = mail_id || username;
+
+        console.log(param,differ,req.body.password)
         try{
-            const contents = await pool.query(`SELECT ${param},user_password FROM users WHERE ${param} = $1`,[differ])
-            if(contents){
-                if(await bcrypt.compare(req.body.password,contents.rows[0].user_password)) res.status(500).send(true)
-                else res.status(400).send(false);
+            const contents = await pool.query(`SELECT user_password FROM users WHERE ${param} = $1`,[differ])
+            if (contents.rows.length === 0) {
+                console.log("returned from step 1")
+                return res.send(false);
             }
-        }catch(e) {console.log(e)}
+
+            const hashedPassword = contents.rows[0].user_password;
+            const valid = await bcrypt.compare(password, hashedPassword);
+            return res.send(valid);
+        }catch(e) {res.send(false);}
     })
 
 }catch(e){

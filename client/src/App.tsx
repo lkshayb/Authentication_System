@@ -10,9 +10,8 @@ function App() {
   const password = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [level,setlevel] = useState(0);
-  setlevel(0)
   useEffect(() => {
-
+    setlevel(0)
     if(localStorage.getItem("hasVisited")) setisReturnedUser(true);
 
     else{
@@ -24,13 +23,28 @@ function App() {
 
   if(isReturnedUser === null) return null;
   
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     setLoading(true);
 
     if(isReturnedUser){
       console.log("Proceeding Login for : \n Email : ",email.current?.value,"\n Password : ",password.current?.value)
+      try{
+        const response = await fetch("http://localhost:3000/login",{
+          method:"POST",
+          headers:{"Content-Type": "application/json"},
+          body: JSON.stringify({
+            mail_id:email.current?.value.toString(),
+            password:password.current?.value.toString()
+          })
+        })
+        const data = await response.json(); 
+        console.log(data);
+      } 
+      catch(e){
+        console.log(e)
+      }
     }
-    console.log("Submit triggered")
+    setLoading(false)
     
   }
 
@@ -51,7 +65,7 @@ function App() {
           <button onClick={handleSubmit}  className={`mt-6 bg-gradient-to-tr from-blue-400 to-blue-600 text-white/90 px-4 py-3 rounded-xl duration-300 ${loading ? "opacity-70 cursor-not-allowed":"hover:opacity-90 cursor-pointer"}`}>
             {loading ? "Loading" : isReturnedUser ? "Login" : "SignUp" }
           </button>
-          <span className='text-gray-600 text-center mt-10'>{isReturnedUser ? "Don't have an account? " : "Already have an account? "} <span onClick={() => setisReturnedUser(e => !e)} className='text-blue-600 cursor-pointer'>{isReturnedUser ? "Sign Up" : "Login"}</span></span>
+          <span className='text-gray-500 text-center mt-10'>{isReturnedUser ? "Don't have an account? " : "Already have an account? "} <span onClick={() => setisReturnedUser(e => !e)} className='text-blue-600 cursor-pointer'>{isReturnedUser ? "Sign Up" : "Login"}</span></span>
         </div>
       </div>
     )

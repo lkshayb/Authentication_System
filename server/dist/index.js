@@ -7,8 +7,12 @@ import bcrypt from "bcrypt";
 import otprouters from './OtpRouter.js';
 dotenv.config();
 const app = express();
+app.use(cors({
+    origin: "http://localhost:5173", // Vite
+    methods: ["GET", "POST"],
+    credentials: true
+}));
 app.use(express.json());
-app.use(cors());
 app.use(bodyParser.json());
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URL
@@ -45,30 +49,23 @@ try {
         }
     });
     app.post('/login', async (req, res) => {
-        let param, differ;
-        if (req.body.mail_id) {
-            param = "mail_id";
-            differ = req.body.mail_id;
-        }
-        else {
-            param = "username";
-            differ = req.body.username;
-        }
+        console.log("RAW BODY:", req.body);
+        const { mail_id, username, password } = req.body;
+        const param = mail_id ? "mail_id" : "username";
+        const differ = mail_id || username;
+        console.log(param, differ, req.body.password);
         try {
-            console.log(param, differ);
-            const contents = await pool.query(`SELECT ${param},user_password FROM users WHERE ${param} = $1`, [differ]);
-            if (contents) {
-                console.log(contents.rows[0]);
-                if (await bcrypt.compare(req.body.password, contents.rows[0].user_password)) {
-                    console.log("password matched");
-                }
-                else {
-                    console.log("Wrong password");
-                }
+            const contents = await pool.query(`SELECT user_password FROM users WHERE ${param} = $1`, [differ]);
+            if (contents.rows.length === 0) {
+                console.log("returned from step 1");
+                return res.send(false);
             }
+            const hashedPassword = contents.rows[0].user_password;
+            const valid = await bcrypt.compare(password, hashedPassword);
+            return res.send(valid);
         }
         catch (e) {
-            console.log("EERROORRR!!!!!!!!!!!!!!!!!!!" + e);
+            res.send(false);
         }
     });
 }
