@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import {Github,Linkedin} from 'lucide-react'
+import {Eye, EyeOff, Github,Linkedin} from 'lucide-react'
 import './App.css'
 
 
@@ -26,20 +26,22 @@ function App() {
     setLoading(true);
 
     if(isReturnedUser){
-      console.log("Proceeding Login for : \n Email : ",email.current?.value,"\n Password : ",password.current?.value)
+      const mail = email.current?.value
+      const pass = password.current?.value
+      const isemail = mail?.includes("@") ? "mail_id" : "username";
+      console.log("Proceeding Login for : \n Email/uname : ",mail,"\n Password : ",pass)
       try{
         const response = await fetch("http://localhost:3000/login",{
           method:"POST",
           headers:{"Content-Type": "application/json"},
           body: JSON.stringify({
-            mail_id:email.current?.value.toString(),
-            password:password.current?.value.toString()
+            [isemail]:mail?.toString(),
+            password:pass?.toString()
           })
         })
         const data = await response.json(); 
-        if(data){
-          setlevel(1.1)
-        }else setlevel(1.2)
+        if(data) setlevel(1.1) 
+        else setlevel(1.2)
       } 
       catch(e){
         alert("An error occured while processing your request! Please try again later.")
@@ -51,7 +53,8 @@ function App() {
 
   function RootComp(){
     function Level0(){
-      return(
+      const [ishidden,setishidden] = useState(true)
+      return( 
         <div className='flex flex-col text-center'>
           <span className='font-sans font-medium text-lg'>{isReturnedUser ? "Welcome back, Captain!" : "Looks like you're new here!"}</span>
           <span className='font-sans font-medium text-xs text-gray-400'>{isReturnedUser ? "We missed you! Please enter your details." : "Let's create a new account for you"}</span> 
@@ -62,7 +65,10 @@ function App() {
             </div>
             <div className={`${isReturnedUser ? "flex flex-col":"hidden"}`}>
               <span className='ml-4'>Password</span>
-              <input type="password" ref={password} className='mt-1 duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder='Enter Password ' />
+              <div className='relative items-center'>
+                <input type={ishidden ? "password" : "text"} ref={password} className=' mt-1 w-full duration-300 border-1 border-gray-300 placeholder-gray-300 focus:placeholder-gray-400 placeholder:font-semibold focus:border-gray-500 focus:outline-none rounded-xl py-3 px-4' placeholder='Enter Password ' />
+                <span onClick={() => setishidden(e => !e)} className='duration-300 absolute right-4 top-3 cursor-pointer hover:bg-gray-100 p-1 rounded-lg'>{ishidden ? <EyeOff className='h-6 text-gray-300'/> : <Eye className='h-6 text-gray-300'/>}</span>
+              </div>
             </div>
             <button onClick={handleSubmit}  className={`mt-6 bg-gradient-to-tr from-blue-400 to-blue-600 text-white/90 px-4 py-3 rounded-xl duration-300 ${loading ? "opacity-70 cursor-not-allowed":"hover:opacity-90 cursor-pointer"}`}>
               {loading ? "Loading" : isReturnedUser ? "Login" : "SignUp" }
